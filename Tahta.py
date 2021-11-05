@@ -5,7 +5,7 @@ class GameState():
         #ikinci harfleri hangi taş olduklarını gösteriyor K = kale, A = at, F = fil, V = Vezir, S= Şah, P = piyon, Y = yeni eklenicek taş
         # "--" boş kareler oldugunu gösteriyor.
         self.board = [
-            ["bK","bA","bY","bF","bV","bS","bF","bY","bA","bK"],
+            ["bK","bA","bA","bF","bV","bS","bF","bA","bA","bK"],
             ["bP","bP","bP","bP","bP","bP","bP","bP","bP","bP"],
             ["--","--","--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--","--","--"],
@@ -14,7 +14,7 @@ class GameState():
             ["--","--","--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--","--","--"],
             ["sP","sP","sP","sP","sP","sP","sP","sP","sP","sP"],
-            ["sK","sA","sY","sF","sV","sS","sF","sY","sA","sK"],
+            ["sK","sA","sA","sF","sV","sS","sF","sA","sA","sK"],
                     ]
         self.whiteToMove = True
         self.moveLog = []
