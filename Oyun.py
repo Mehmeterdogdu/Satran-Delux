@@ -22,10 +22,28 @@ def main():
     gs = Tahta.GameState()
     loadImage()  #bir kere yapmak yeterli
     running = True
+    sqSelected = () #oyuncunun seçtigi kareyi kaydetmek için (col , row) / şuanda seçili değil
+    playerClicks = []  #oyuncunun tıklamalarını kaydetmek için / 2 tıklama (6,4)/(4,4)
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running=False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                if sqSelected == (row,col): #oyuncunun aynı iki kareyi seçmemesi için
+                    sqSelected = () # seçilen kareyi temizler
+                    playerClicks = [] # oyuncunun seçtigi iki kareyi temizler
+                else:
+                    sqSelected = (row,col)
+                    playerClicks.append(sqSelected)  #append birinci ve ikinci tıklamayı eklemek için
+                if len(playerClicks) == 2 : #ikinci tıklamadan sonra
+                    move = Tahta.Adım(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    sqSelected = () # kullanıcı tıklamalarını silmek için
+                    playerClicks = []
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
