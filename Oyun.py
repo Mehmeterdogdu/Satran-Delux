@@ -20,6 +20,10 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = Tahta.GameState()
+  #  validMoves = gs.getValidMoves()
+    moveMade = False #hamle sırasını belirlemek için kullanılan veriyi azaltmak için
+
+
     loadImage()  #bir kere yapmak yeterli
     running = True
     sqSelected = () #oyuncunun seçtigi kareyi kaydetmek için (col , row) / şuanda seçili değil
@@ -41,9 +45,22 @@ def main():
                 if len(playerClicks) == 2 : #ikinci tıklamadan sonra
                     move = Tahta.Adım(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                  #  if move in validMoves:     #eğer hamle izin verilen hareketlerdense yapılabilir
+                    gs.makeMove(move)   #if içine almak için bir kere tab
+                    moveMade = True      #if içine almak için bir kere tab
                     sqSelected = () # kullanıcı tıklamalarını silmek için
                     playerClicks = []
+            # geri alma tuşu
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    gs.undoMove()
+                    moveMade = True
+                    
+      #  if moveMade:
+       #     validMoves = gs.getValidMoves()
+        #    moveMade = False
+        
+                
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
