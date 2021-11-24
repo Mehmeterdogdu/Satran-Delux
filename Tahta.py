@@ -4,7 +4,7 @@ class GameState():
         #ilk harfleri rengi temsil ediyor b = beyaz , s = siyah
         #ikinci harfleri hangi taş olduklarını gösteriyor K = kale, A = at, F = fil, V = Vezir, S= Şah, P = piyon, Y = yeni eklenicek taş
         # "--" boş kareler oldugunu gösteriyor.
-        self.board = [
+        self.board = [   
             ["sK","sA","sA","sF","sV","sS","sF","sA","sA","sK"],
             ["sP","sP","sP","sP","sP","sP","sP","sP","sP","sP"],
             ["--","--","--","--","--","--","--","--","--","--"],
