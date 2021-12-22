@@ -23,7 +23,6 @@ def main():
     validMoves = gs.getValidMoves()
     moveMade = False #hamle sırasını belirlemek için kullanılan veriyi azaltmak için
 
-
     loadImage()  #bir kere yapmak yeterli
     running = True
     sqSelected = () #oyuncunun seçtigi kareyi kaydetmek için (col , row) / şuanda seçili değil
@@ -32,6 +31,7 @@ def main():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running=False
+                #fare düzenleyicisi
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
                 col = location[0]//SQ_SIZE
