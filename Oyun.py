@@ -1,8 +1,8 @@
 import pygame as p
 import Tahta
 
-WIDTH = HEIGHT = 512 #400 diğer seçenek
-DIMENSION = 10 # tahtanın boyutu 8x8 
+WIDTH = HEIGHT = 700 #400 diğer seçenek
+DIMENSION = 10 # tahtanın boyutu 10x10
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15   # ANİMASYONLAR İÇİN 
 IMAGES = {}
