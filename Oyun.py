@@ -2,10 +2,11 @@ import pygame as p
 import Tahta
 
 '''
-3) fil çarpma ekle
 4)piyonun karşıya gitme durumu
 5) başlangıç ekranı eklenicek
+5,5) yeni taş ekle
 6) data base eklenicek
+7)rok eklenebilir
 '''
 
 WIDTH = HEIGHT = 700 #400 diğer seçenek
@@ -48,14 +49,11 @@ def main():
                     if sqSelected == (row,col): #oyuncunun aynı iki kareyi seçmemesi için
                         sqSelected = () # seçilen kareyi temizler
                         playerClicks = [] # oyuncunun seçtigi iki kareyi temizler
-                        print("temizledi",playerClicks)
                     else:
                         sqSelected = (row,col)
                         playerClicks.append(sqSelected)  #append birinci ve ikinci tıklamayı eklemek için
                     if len(playerClicks) == 2 and playerClicks[0] != (): #ikinci tıklamadan sonra
-                        print("temizledi",playerClicks)
                         move = Tahta.Adım(playerClicks[0], playerClicks[1], gs.board)
-                        print(move.getChessNotation())
                         print(move.getChessNotation())
                         for(i) in range(len(validMoves)):
                             if move == validMoves[i]:     #eğer hamle izin verilen hareketlerdense yapılabilir

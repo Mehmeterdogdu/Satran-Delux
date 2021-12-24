@@ -1,4 +1,4 @@
-from os import pipe
+from os import X_OK, pipe
 
 
 class GameState():
@@ -37,6 +37,10 @@ class GameState():
         self.board[move.endRow][move.endCol]= move.pieceMoved
         self.moveLog.append(move) #log the move şuanda boş 
         self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
+        if self.whiteToMove:
+            print("sıra beyazda")
+        else:
+            print("sora siyahta")
         if move.pieceMoved == "bS":
             self.whiteKingLocation = (move.endRow,move.endCol)
         elif move.pieceMoved == "sS":
@@ -50,6 +54,10 @@ class GameState():
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove #turu diğer oyuncuya geçirmek için
+            if self.whiteToMove:
+                print("sıra beyazda")
+            else:
+                print("sora siyahta")
             if move.pieceMoved == "bS":
                 self.whiteKingLocation = (move.startRow,move.startCol)
             elif move.pieceMoved == "sS":
@@ -298,10 +306,58 @@ class GameState():
         directions = ((-1,-1),(-1,1),(1,-1),(1,1))   #(sol üst) (sag üst) (sol alt)(sag alt)
         enemyColor = "s" if self.whiteToMove else "b"
         for d in directions:
+            x = 2
+            y = 2
             for i in range(1,10):
                 endRow = r+d[0]*i   
                 endCol = c+d[1]*i
-                if -1 < endRow <10 and -1< endCol <10:
+                if endRow < 0 and 0<= endCol <10:
+                    endRow = endRow*(-1)
+                    if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                elif endRow >= 10 and 0<= endCol <10:
+                    endRow = endRow-x
+                    x=x+2
+                    if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                elif 0 <= endRow <10 and endCol <0 :
+                    endCol = endCol*(-1)
+                    if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                elif 0 <= endRow <10 and endCol >=10 :
+                    endCol = endCol-y
+                    y = y+2
+                    if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                elif 0 <= endRow <10 and 0<= endCol <10:
                     if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
                         endPiece = self.board[endRow][endCol]
                         if endPiece == "--":
@@ -313,6 +369,7 @@ class GameState():
                             break
                 else:  
                     break
+
 
     def defaultAt(self,r,c,moves):
         piecePinned = False
