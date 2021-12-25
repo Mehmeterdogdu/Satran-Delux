@@ -1,4 +1,6 @@
 from os import X_OK, pipe
+import pygame as p
+from pygame.display import set_mode
 
 
 class GameState():
@@ -28,6 +30,8 @@ class GameState():
         self.staleMate = False
         self.pins = []
         self.checks = []
+        self.silinentas = []
+        self.hamlesayısı = 0
 
 
       
@@ -36,6 +40,7 @@ class GameState():
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol]= move.pieceMoved
         self.moveLog.append(move) #log the move şuanda boş 
+        self.hamlesayısı = self.hamlesayısı+1
         self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
         if self.whiteToMove:
             print("sıra beyazda")
@@ -51,8 +56,13 @@ class GameState():
     def undoMove(self):
         if len(self.moveLog) != 0 :
             move = self.moveLog.pop()
+            self.hamlesayısı = self.hamlesayısı-1
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
+            if len(self.silinentas) != 0 and self.hamlesayısı+1 == self.silinentas[len(self.silinentas)-1][3]:
+                silinenTaşSayısı =len(self.silinentas)
+                self.board[self.silinentas[silinenTaşSayısı-1][1]][self.silinentas[silinenTaşSayısı-1][2]] = self.silinentas[silinenTaşSayısı-1][0]
+                self.silinentas.remove(self.silinentas[silinenTaşSayısı-1])
             self.whiteToMove = not self.whiteToMove #turu diğer oyuncuya geçirmek için
             if self.whiteToMove:
                 print("sıra beyazda")
@@ -62,6 +72,35 @@ class GameState():
                 self.whiteKingLocation = (move.startRow,move.startCol)
             elif move.pieceMoved == "sS":
                 self.blackKingLocation = (move.startRow,move.startCol)
+
+    def piyonson(self,SQ_SIZE,sqSelected,hamlesayısı):
+        self.whiteToMove = not self.whiteToMove
+        seçim = True
+        while seçim:
+            for e in p.event.get():
+                if e.type == p.QUIT:
+                    seçim = False
+                    self.undoMove()
+                if e.type == p.MOUSEBUTTONDOWN:
+                    location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
+                    col = location[0]//SQ_SIZE
+                    row = location[1]//SQ_SIZE 
+                    enemyColor = "s" if self.whiteToMove else "b"
+                    if self.board[row][col][1] != "S" and self.board[row][col][0] == enemyColor:
+                        tasOzellikleri =(self.board[row][col],row,col,hamlesayısı)
+                        self.silinentas.append(tasOzellikleri)                    
+                        self.board[row][col]= "--"
+                        self.board[sqSelected[0]][sqSelected[1]] = "--"
+                        seçim = False
+                    else:
+                        location = ()
+        self.whiteToMove = not self.whiteToMove
+    
+    def isPawnPromot(self,move):
+        if move.isPawnPromotion:
+            return True
+        else:
+            return False
 
 # satrançtaki yapılması uygun bütün hamleler örnek : 
    # eğer bir taş şahı tehtit ederse bu tehtidi engellemek dışındaki bütün hamleler geçersin olur.
@@ -462,6 +501,9 @@ class Adım():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.isPawnPromotion = False
+        if (self.pieceMoved=="bP" and self.endRow == 0) or (self.pieceMoved == "sP" and self.endRow == 9):
+            self.isPawnPromotion = True
         self.moveID = self.startRow*1000+self.startCol *100+self.endRow * 10+self.endCol
       
     def __eq__(self, other):

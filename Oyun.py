@@ -2,9 +2,9 @@ import pygame as p
 import Tahta
 
 '''
-4)piyonun karşıya gitme durumu
 5) başlangıç ekranı eklenicek
 5,5) yeni taş ekle
+5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek
 6) data base eklenicek
 7)rok eklenebilir
 '''
@@ -58,6 +58,8 @@ def main():
                         for(i) in range(len(validMoves)):
                             if move == validMoves[i]:     #eğer hamle izin verilen hareketlerdense yapılabilir
                                 gs.makeMove(validMoves[i])   #if içine almak için bir kere tab
+                                if gs.isPawnPromot(validMoves[i]):
+                                    gs.piyonson(SQ_SIZE,sqSelected,gs.hamlesayısı)
                                 moveMade = True      #if içine almak için bir kere tab
                                 animate = True
                                 sqSelected = () # kullanıcı tıklamalarını silmek için
