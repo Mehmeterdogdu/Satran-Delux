@@ -10,7 +10,7 @@ class GameState():
         #ikinci harfleri hangi taş olduklarını gösteriyor K = kale, A = at, F = fil, V = Vezir, S= Şah, P = piyon, Y = yeni eklenicek taş
         # "--" boş kareler oldugunu gösteriyor.
         self.board = [   
-            ["sK","sA","sA","sF","sV","sS","sF","sA","sA","sK"],
+            ["sK","sA","sY","sF","sV","sS","sF","sY","sA","sK"],
             ["sP","sP","sP","sP","sP","sP","sP","sP","sP","sP"],
             ["--","--","--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--","--","--"],
@@ -19,7 +19,20 @@ class GameState():
             ["--","--","--","--","--","--","--","--","--","--"],
             ["--","--","--","--","--","--","--","--","--","--"],
             ["bP","bP","bP","bP","bP","bP","bP","bP","bP","bP"],
-            ["bK","bA","bA","bF","bV","bS","bF","bA","bA","bK"]]
+            ["bK","bA","bY","bF","bV","bS","bF","bY","bA","bK"]
+
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","bF","--"],
+        #    ["--","--","--","--","--","--","--","--","sF","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"]
+            ]
+
        # self.moveFunctions = {"P": self.getPiyonMoves,"K": self.getKaleMoves,"A":self.getAtMoves,"F":self.getFilMoves,"V": self.getVezirMoves,"S": self.getSahMoves}
         self.whiteToMove = True
         self.moveLog = []
@@ -32,6 +45,7 @@ class GameState():
         self.checks = []
         self.silinentas = []
         self.hamlesayısı = 0
+        self.lastmove = ()
 
 
       
@@ -39,13 +53,16 @@ class GameState():
     def makeMove(self,move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol]= move.pieceMoved
-        self.moveLog.append(move) #log the move şuanda boş 
-        self.hamlesayısı = self.hamlesayısı+1
-        self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
-        if move.pieceMoved == "bS":
-            self.whiteKingLocation = (move.endRow,move.endCol)
-        elif move.pieceMoved == "sS":
-            self.blackKingLocation = (move.endRow,move.endCol)
+        if move != self.lastmove:
+            self.lastmove = move
+            self.moveLog.append(move) #log the move şuanda boş 
+            print(move.getChessNotation())
+            self.hamlesayısı = self.hamlesayısı+1
+            self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
+            if move.pieceMoved == "bS":
+                self.whiteKingLocation = (move.endRow,move.endCol)
+            elif move.pieceMoved == "sS":
+                self.blackKingLocation = (move.endRow,move.endCol)
             
         
     
@@ -60,10 +77,6 @@ class GameState():
                 self.board[self.silinentas[silinenTaşSayısı-1][1]][self.silinentas[silinenTaşSayısı-1][2]] = self.silinentas[silinenTaşSayısı-1][0]
                 self.silinentas.remove(self.silinentas[silinenTaşSayısı-1])
             self.whiteToMove = not self.whiteToMove #turu diğer oyuncuya geçirmek için
-            if self.whiteToMove:
-                print("sıra beyazda")
-            else:
-                print("sora siyahta")
             if move.pieceMoved == "bS":
                 self.whiteKingLocation = (move.startRow,move.startCol)
             elif move.pieceMoved == "sS":
@@ -235,6 +248,8 @@ class GameState():
                         self.getVezirMoves(r,c,moves)
                     elif piece == "S":
                         self.getSahMoves(r,c,moves)
+                    elif piece == "Y":
+                        self.getYeniMoves(r,c,moves)
         return moves
     #taş hareketleri
 
@@ -292,7 +307,7 @@ class GameState():
         directions = ((-1,0),(0,-1),(1,0),(0,1))
         enemyColor = "s" if self.whiteToMove else "b"
         for d in directions:
-            for i in range(1,8):
+            for i in range(1,10):
                 endRow = r + d[0]*i
                 endCol = c + d[1]*i
                 if 0 <= endRow < 10 and 0 <= endCol < 10 :
@@ -457,8 +472,59 @@ class GameState():
         self.getKaleMoves(r,c,moves)
         self.defaultAt(r,c,moves)
         self.defaultFil(r,c,moves)
-        
-
+    
+    def getYeniMoves(self,r,c,moves):
+        piecePinned = False
+        pinDirection = ()
+        for i in range(len(self.pins)-1,-1,-1):
+            if self.pins[i][0] == r and self.pins[i][1] == c:
+                piecePinned = True
+                pinDirection= (self.pins[i][2],self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+        directions = ((-1,0),(0,-1),(1,0),(0,1))
+        enemyColor = "s" if self.whiteToMove else "b"
+        allyColor = "b" if self.whiteToMove else "s"
+        for d in directions:
+            for i in range(1,3):
+                endRow = r + d[0]*i
+                endCol = c + d[1]*i
+                if 0 <= endRow < 10 and 0 <= endCol < 10 :
+                    if not piecePinned or pinDirection == d or pinDirection == (-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                else:
+                    break
+        for i in range(len(self.pins)-1,-1,-1):
+            if self.pins[i][0] == r and self.pins[i][1] == c:
+                piecePinned = True
+                pinDirection = (self.pins[i][2],self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+        directions = ((-1,-1),(-1,1),(1,-1),(1,1))
+        enemyColor = "s" if self.whiteToMove else "b"
+        for d in directions:
+            for i in range(1,3):
+                endRow = r+d[0]*i
+                endCol = c+d[1]*i
+                if 0 <= endRow <10 and 0<= endCol <10:
+                    if not piecePinned or pinDirection== d or pinDirection ==(-d[0],-d[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                        elif endPiece[0] == enemyColor:
+                            moves.append(Adım((r,c),(endRow,endCol),self.board))
+                            break
+                        else:
+                            break
+                else:
+                    break
     def getSahMoves(self,r,c,moves):  #Sah
         rowMoves = (-1 ,-1 ,-1 , 0 , 0 , 1 , 1 , 1 )
         colMoves = (-1 , 0 , 1 , 1 , -1 ,-1 , 0 ,1 )
@@ -509,6 +575,9 @@ class Adım():
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow,self.endCol)
+
+    def yazdır(self):
+        print(self.getChessNotation())
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]

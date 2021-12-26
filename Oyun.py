@@ -3,28 +3,28 @@ import pygame as p
 import Tahta,bot
 
 '''
-x)bot sona taş getirince bir taş yok ediyor mu bilmiyorum deneyemiyorum
-x.2)botlar oynarken log.move'u yazdıramıyorum
-5,5) yeni taş ekle
+
+x)bot sona taş getirince bir taş yok ETMİYOR çalışmıyor
+
 5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek
 6) data base eklenicek
-7)rok eklenebilir çok sanmıyorum ama
+7) bi ara bota biraz zeka ekle
+
 '''
 
-WIDTH = HEIGHT = 800 #400 diğer seçenek
+WIDTH = HEIGHT = 700 #400 diğer seçenek
 DIMENSION = 10 # tahtanın boyutu 10x10
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15   # ANİMASYONLAR İÇİN 
 IMAGES = {}
 #taşların resimlerini almak için kullanıyoruz
 def loadImage():
-    pieces = ["bA","bF","bK","bP","bS","bV","sA","sF","sK","sP","sS","sV"]
+    pieces = ["bA","bF","bK","bP","bY","bS","bV","sA","sF","sK","sP","sS","sV","sY"]
     for piece in pieces:
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"),(SQ_SIZE,SQ_SIZE))
 
 #programı çalıştırıcak olan bölüm
-
-def main(taraf):
+def main(taraf,renk):
     p.init()
     screen = p.display.set_mode((WIDTH,HEIGHT))   #p.FULLSCREEN
     clock = p.time.Clock()
@@ -39,8 +39,12 @@ def main(taraf):
     playerClicks = []  #oyuncunun tıklamalarını kaydetmek için / 2 tıklama (6,4)/(4,4)
     gameOver = False
     if taraf==1:
-        playerOne = False
-        playerTwo = True
+        if renk == "1":
+            playerOne = True
+            playerTwo = False
+        else:
+            playerOne= False
+            playerTwo = True
     else:
         playerOne = True
         playerTwo = True
@@ -63,7 +67,6 @@ def main(taraf):
                         playerClicks.append(sqSelected)  #append birinci ve ikinci tıklamayı eklemek için
                     if len(playerClicks) == 2 and playerClicks[0] != (): #ikinci tıklamadan sonra
                         move = Tahta.Adım(playerClicks[0], playerClicks[1], gs.board)
-                        print(move.getChessNotation())
                         for(i) in range(len(validMoves)):
                             if move == validMoves[i]:     #eğer hamle izin verilen hareketlerdense yapılabilir
                                 gs.makeMove(validMoves[i])   #if içine almak için bir kere tab
@@ -97,6 +100,7 @@ def main(taraf):
         if not gameOver and not humanTurn :
             AIMove = bot.findRandomMove(validMoves)
             gs.makeMove(AIMove)
+            '''
             if gs.isPawnPromot(AIMove):
                 gs.whiteToMove = not gs.whiteToMove
                 if gs.whiteToMove:
@@ -105,7 +109,7 @@ def main(taraf):
                     turn = "s"
                 sqSelected = bot.yoket(turn)
                 gs.whiteToMove = not gs.whiteToMove
-                gs.piyonson(SQ_SIZE,sqSelected,gs.hamlesayısı)
+                gs.piyonson(SQ_SIZE,sqSelected,gs.hamlesayısı)'''
             moveMade = True
             animate = True
 
@@ -197,4 +201,4 @@ def drawText(screen, text):
     screen.blit(textObject,textLocation.move(2,2))
 
 if __name__ == "__main__":
-    main(2)
+    main(2,0)

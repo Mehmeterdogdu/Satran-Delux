@@ -15,7 +15,7 @@ def yoket(turn):
     if turn=="b":
         for r in range(0,10):
             for c in range(0,10):
-                if gs.board[r][c][0] == "s" and gs.board[r][c][1] == "S":
+                if gs.board[r][c][0] == "s" and gs.board[r][c][1] != "S":
                     sqselected = (r,c)
                     move.append(sqselected)
         return move[random.randint(0,len(move)-1)]
@@ -23,7 +23,7 @@ def yoket(turn):
     else:
         for r in range(0,10):
             for c in range(0,10):
-                if gs.board[r][c][0] == "b" and gs.board[r][c][1] == "S":
+                if gs.board[r][c][0] == "b" and gs.board[r][c][1] != "S":
                     sqselected = (r,c)
                     move.append(sqselected)
         return move[random.randint(0,len(move)-1)]

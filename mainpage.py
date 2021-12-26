@@ -2,25 +2,23 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import Oyun
 
-
 class Ui_Form(object):
 
-    def botakarsi(self):
-        Oyun.main(1)
+    def botakarsisiyah(self):
+        Oyun.main(1,2)
         app.exit(app.exec())
-        
-
+    def botakarsibeyaz(self):
+        Oyun.main(1,1)
+        app.exit(app.exec())
     def ikioyunculu(self):
-        Oyun.main(2)
+        Oyun.main(2,0)
         app.exit(app.exec())
-        
-
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1000, 600)
-        Form.setMinimumSize(QtCore.QSize(1000, 600))
-        Form.setMaximumSize(QtCore.QSize(1000, 600))
+        Form.resize(1000, 700)
+        Form.setMinimumSize(QtCore.QSize(1000, 700))
+        Form.setMaximumSize(QtCore.QSize(1000, 700))
         Form.setStyleSheet("background-color: rgb(0, 85, 255);")
         self.pushButton = QtWidgets.QPushButton(Form)
         self.pushButton.setGeometry(QtCore.QRect(110, 270, 291, 161))
@@ -43,15 +41,26 @@ class Ui_Form(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setIndent(-1)
         self.label.setObjectName("label")
+        self.pushButton_3 = QtWidgets.QPushButton(Form)
+        self.pushButton_3.setGeometry(QtCore.QRect(520, 370, 401, 141))
+        self.pushButton_3.setMinimumSize(QtCore.QSize(401, 141))
+        self.pushButton_3.setMaximumSize(QtCore.QSize(401, 141))
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        self.pushButton_3.setFont(font)
+        self.pushButton_3.setStyleSheet("background-color: rgb(255, 170, 127);")
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.clicked.connect(self.botakarsisiyah)
         self.pushButton_2 = QtWidgets.QPushButton(Form)
-        self.pushButton_2.setGeometry(QtCore.QRect(610, 270, 291, 161))
+        self.pushButton_2.setGeometry(QtCore.QRect(520, 230, 401, 141))
+        self.pushButton_2.setMinimumSize(QtCore.QSize(401, 141))
+        self.pushButton_2.setMaximumSize(QtCore.QSize(400, 1000))
         font = QtGui.QFont()
         font.setPointSize(20)
         self.pushButton_2.setFont(font)
         self.pushButton_2.setStyleSheet("background-color: rgb(255, 170, 127);")
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.clicked.connect(self.botakarsi)
-        
+        self.pushButton_2.clicked.connect(self.botakarsibeyaz)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -61,7 +70,8 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", "Form"))
         self.pushButton.setText(_translate("Form", "2 Oyunculu oyun"))
         self.label.setText(_translate("Form", "Satranç Delux"))
-        self.pushButton_2.setText(_translate("Form", "Bota karşı oyna"))
+        self.pushButton_3.setText(_translate("Form", "Siyah bota karşı oyna"))
+        self.pushButton_2.setText(_translate("Form", "Beyaz bota karşı oyna"))
 
 
 if __name__ == "__main__":
