@@ -42,10 +42,6 @@ class GameState():
         self.moveLog.append(move) #log the move şuanda boş 
         self.hamlesayısı = self.hamlesayısı+1
         self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
-        if self.whiteToMove:
-            print("sıra beyazda")
-        else:
-            print("sora siyahta")
         if move.pieceMoved == "bS":
             self.whiteKingLocation = (move.endRow,move.endCol)
         elif move.pieceMoved == "sS":

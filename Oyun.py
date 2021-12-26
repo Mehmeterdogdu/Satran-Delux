@@ -1,15 +1,17 @@
+from os import pipe
 import pygame as p
-import Tahta
+import Tahta,bot
 
 '''
-5) başlangıç ekranı eklenicek
+x)bot sona taş getirince bir taş yok ediyor mu bilmiyorum deneyemiyorum
+x.2)botlar oynarken log.move'u yazdıramıyorum
 5,5) yeni taş ekle
 5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek
 6) data base eklenicek
-7)rok eklenebilir
+7)rok eklenebilir çok sanmıyorum ama
 '''
 
-WIDTH = HEIGHT = 700 #400 diğer seçenek
+WIDTH = HEIGHT = 800 #400 diğer seçenek
 DIMENSION = 10 # tahtanın boyutu 10x10
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15   # ANİMASYONLAR İÇİN 
@@ -22,7 +24,7 @@ def loadImage():
 
 #programı çalıştırıcak olan bölüm
 
-def main():
+def main(taraf):
     p.init()
     screen = p.display.set_mode((WIDTH,HEIGHT))   #p.FULLSCREEN
     clock = p.time.Clock()
@@ -36,13 +38,20 @@ def main():
     sqSelected = () #oyuncunun seçtigi kareyi kaydetmek için (col , row) / şuanda seçili değil
     playerClicks = []  #oyuncunun tıklamalarını kaydetmek için / 2 tıklama (6,4)/(4,4)
     gameOver = False
+    if taraf==1:
+        playerOne = False
+        playerTwo = True
+    else:
+        playerOne = True
+        playerTwo = True
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running=False
                 #fare düzenleyicisi
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
@@ -84,12 +93,26 @@ def main():
                         gameOver = False
                 if e.key == p.K_q:
                     running=False
-                    
+
+        if not gameOver and not humanTurn :
+            AIMove = bot.findRandomMove(validMoves)
+            gs.makeMove(AIMove)
+            if gs.isPawnPromot(AIMove):
+                gs.whiteToMove = not gs.whiteToMove
+                if gs.whiteToMove:
+                    turn = "b"
+                else:
+                    turn = "s"
+                sqSelected = bot.yoket(turn)
+                gs.whiteToMove = not gs.whiteToMove
+                gs.piyonson(SQ_SIZE,sqSelected,gs.hamlesayısı)
+            moveMade = True
+            animate = True
+
         if moveMade:
             if animate:
                 animateMove(gs.moveLog[-1],screen,gs.board,clock)
             validMoves = gs.getValidMoves()
-
             moveMade = False
             animate = False
         
@@ -174,4 +197,4 @@ def drawText(screen, text):
     screen.blit(textObject,textLocation.move(2,2))
 
 if __name__ == "__main__":
-    main()
+    main(2)
