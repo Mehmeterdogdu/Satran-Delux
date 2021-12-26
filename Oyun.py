@@ -5,16 +5,18 @@ import Tahta,bot
 '''
 
 x)bot sona taş getirince bir taş yok ETMİYOR çalışmıyor
-
+x)son kalan taş sahsa berabere bitme eklemedim
 5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek
 6) data base eklenicek
 7) bi ara bota biraz zeka ekle
 
 '''
 
-WIDTH = HEIGHT = 700 #400 diğer seçenek
+tahta_WIDTH = tahta_HEIGHT = 700 
+moveLogPanelWıdth = 300
+moveLogPanelHeıght = tahta_HEIGHT
 DIMENSION = 10 # tahtanın boyutu 10x10
-SQ_SIZE = HEIGHT // DIMENSION
+SQ_SIZE = tahta_HEIGHT // DIMENSION
 MAX_FPS = 15   # ANİMASYONLAR İÇİN 
 IMAGES = {}
 #taşların resimlerini almak için kullanıyoruz
@@ -26,9 +28,10 @@ def loadImage():
 #programı çalıştırıcak olan bölüm
 def main(taraf,renk):
     p.init()
-    screen = p.display.set_mode((WIDTH,HEIGHT))   #p.FULLSCREEN
+    screen = p.display.set_mode((tahta_WIDTH+moveLogPanelWıdth,tahta_HEIGHT))   #p.FULLSCREEN
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
+    moveLogFont = p.font.SysFont("Arial",16,False,False)
     gs = Tahta.GameState()
     validMoves = gs.getValidMoves()
     moveMade = False #hamle sırasını belirlemek için kullanılan veriyi azaltmak için
@@ -59,7 +62,7 @@ def main(taraf,renk):
                     location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
-                    if sqSelected == (row,col): #oyuncunun aynı iki kareyi seçmemesi için
+                    if sqSelected == (row,col) or col >=10: #oyuncunun aynı iki kareyi seçmemesi için
                         sqSelected = () # seçilen kareyi temizler
                         playerClicks = [] # oyuncunun seçtigi iki kareyi temizler
                     else:
@@ -120,22 +123,42 @@ def main(taraf,renk):
             moveMade = False
             animate = False
         
-        drawGameState(screen, gs,validMoves,sqSelected)
+        drawGameState(screen, gs,validMoves,sqSelected,moveLogFont)
 
-        if gs.checkMate:
+        if gs.checkMate or gs.staleMate:
             gameOver = True
-            if gs.whiteToMove:
-                drawText(screen,"Black wins by checkmate")
+            if gs.staleMate:
+                gameOver = True
+                text ="Stalemate"
             else:
-                drawText(screen,"white wins by checkmate")
-        elif gs.staleMate:
-            gameOver = True
-            drawText(screen,"Stalemate")
+                if gs.whiteToMove:
+                    text ="Black wins by checkmate"
+                else:
+                    text ="white wins by checkmate" 
+            drawEndGameText(screen,text)
                 
         
         clock.tick(MAX_FPS)
         p.display.flip()
 
+
+
+
+
+def drawGameState(screen,gs,validMoves,sqSelected,moveLogFont):
+    drawBoard(screen)  # oyunun karelerini çizmek için
+    hinglightSquares(screen,gs,validMoves,sqSelected)
+    drawPieces(screen, gs.board) #oyunun taşlarını çizmek için
+    drawMoveLog(screen,gs,moveLogFont)
+
+
+def drawBoard(screen):
+    global colors
+    colors = [p.Color("white"), p.Color("gray")]
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            color = colors[((r+c) % 2)]
+            p.draw.rect(screen,color,p.Rect(c*SQ_SIZE, r*SQ_SIZE,SQ_SIZE,SQ_SIZE))
 
 def hinglightSquares(screen,gs,validMoves,sqSelected):
     if sqSelected != ():
@@ -149,22 +172,6 @@ def hinglightSquares(screen,gs,validMoves,sqSelected):
             for move in validMoves:
                 if move.startRow == r and move.startCol == c:
                     screen.blit(s, (SQ_SIZE*move.endCol,SQ_SIZE*move.endRow))
-
-
-def drawGameState(screen,gs,validMoves,sqSelected):
-    drawBoard(screen)  # oyunun karelerini çizmek için
-    hinglightSquares(screen,gs,validMoves,sqSelected)
-    drawPieces(screen, gs.board) #oyunun taşlarını çizmek için
-
-
-def drawBoard(screen):
-    global colors
-    colors = [p.Color("white"), p.Color("gray")]
-    for r in range(DIMENSION):
-        for c in range(DIMENSION):
-            color = colors[((r+c) % 2)]
-            p.draw.rect(screen,color,p.Rect(c*SQ_SIZE, r*SQ_SIZE,SQ_SIZE,SQ_SIZE))
-
             
 def drawPieces(screen, board):
     for r in range(DIMENSION):
@@ -172,6 +179,31 @@ def drawPieces(screen, board):
             piece = board[r][c]
             if piece != "--": #eğer boş değilse
                 screen.blit(IMAGES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+def drawMoveLog(screen,gs,font):
+    moveLogRect = p.Rect(tahta_WIDTH,0,moveLogPanelWıdth,moveLogPanelHeıght)
+    p.draw.rect(screen,p.Color("black"), moveLogRect)
+    moveLog = gs.moveLog
+    moveTexts = []
+    for i in range(0,len(moveLog),2):
+        movestring = "  "+str(i//2 +1) + ". " +moveLog[i].getChessNotation()+ " "
+        if i+1 <len(moveLog):
+            movestring += moveLog[i+1].getChessNotation()
+        moveTexts.append(movestring)
+    
+    movesPerRow = 3
+    padding = 5
+    lanespacing = 3
+    textY = padding
+    for i in range(0 , len(moveTexts),movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i+j < len(moveTexts):
+                text += moveTexts[i+j]
+        textObject = font.render(text,True,p.Color("white"))
+        textLocation = moveLogRect.move(padding,textY)
+        screen.blit(textObject,textLocation)
+        textY += textObject.get_height() + lanespacing
 
 def animateMove(move,screen,board,clock):
     global colors
@@ -192,10 +224,10 @@ def animateMove(move,screen,board,clock):
         p.display.flip()
         clock.tick(60)
 
-def drawText(screen, text):
+def drawEndGameText(screen, text):
     font = p.font.SysFont("Helvitca",32,True,False)
     textObject = font.render(text,0,p.Color("Gray"))
-    textLocation = p.Rect(0,0,WIDTH,HEIGHT).move(WIDTH/2-textObject.get_width()/2,HEIGHT/2-textObject.get_height()/2)
+    textLocation = p.Rect(0,0,tahta_WIDTH,tahta_HEIGHT).move(tahta_WIDTH/2-textObject.get_width()/2,tahta_HEIGHT/2-textObject.get_height()/2)
     screen.blit(textObject,textLocation)
     textObject = font.render(text,0,p.Color("Black"))
     screen.blit(textObject,textLocation.move(2,2))

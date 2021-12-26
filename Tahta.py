@@ -21,15 +21,15 @@ class GameState():
             ["bP","bP","bP","bP","bP","bP","bP","bP","bP","bP"],
             ["bK","bA","bY","bF","bV","bS","bF","bY","bA","bK"]
 
+        #   ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #   ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","bY","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","--"],
+        #    ["--","--","--","--","--","--","--","--","--","bP"],
         #    ["--","--","--","--","--","--","--","--","--","--"],
         #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","--","--"],
-        #    ["--","--","--","--","--","--","--","--","bF","--"],
-        #    ["--","--","--","--","--","--","--","--","sF","--"],
         #    ["--","--","--","--","--","--","--","--","--","--"]
             ]
 
@@ -271,7 +271,12 @@ class GameState():
                         moves.append(Adım((r,c),(r-2,c),self.board))
                         if r == 8 and self.board[r-3][c] =="--": #2 adım ilerlemesi için
                             moves.append(Adım((r,c),(r-3,c),self.board)) 
-
+            if c == 0 and self.board[r][c+1]== "--":
+                if not piecePinned or pinDirection == (0,1):
+                    moves.append(Adım((r,c),(r,c+1),self.board))
+            if c == 9 and self.board[r][c-1]== "--":
+                if not piecePinned or pinDirection == (0,-1):
+                    moves.append(Adım((r,c),(r,c-1),self.board))
             if r-1 >= 0 and c-1 >= 0 and self.board[r-1][c-1][0] == "s":  #soldaki taşı yemek için
                 if not piecePinned or pinDirection == (-1,-1):
                     moves.append(Adım((r,c),(r-1,c-1),self.board)) 
@@ -575,9 +580,6 @@ class Adım():
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow,self.endCol)
-
-    def yazdır(self):
-        print(self.getChessNotation())
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
