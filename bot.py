@@ -3,13 +3,19 @@ import Tahta
 
 gs = Tahta.GameState()
 
+'''
+1)önce kendi hamlelerini yapıcak yaptıgı hamlenin puan değeri olucak
+2)rakip hamle yapıcak bu hamleye göre puan değeri azalıcak
+3) tekrar hamle yapıcak tekrar puan kazanıcak
+4)tekrar rakip hamle yapıcak tekrar puan kaybedicek
+5)bu hamleler sonunda en iyi yola giden 1.hamleyi yapıcak
+ 
+'''
 
 def findRandomMove(validMoves):
     return validMoves[random.randint(0,len(validMoves)-1)]
 
-def findBestMove():
-    return
-
+'''
 def yoket(turn):
     move= []
     if turn=="b":
@@ -28,4 +34,4 @@ def yoket(turn):
                     move.append(sqselected)
         return move[random.randint(0,len(move)-1)]
                 
-        
+'''

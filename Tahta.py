@@ -56,7 +56,6 @@ class GameState():
         if move != self.lastmove:
             self.lastmove = move
             self.moveLog.append(move) #log the move şuanda boş 
-            print(move.getChessNotation())
             self.hamlesayısı = self.hamlesayısı+1
             self.whiteToMove = not self.whiteToMove #oyuncu değişmek için
             if move.pieceMoved == "bS":
@@ -64,7 +63,8 @@ class GameState():
             elif move.pieceMoved == "sS":
                 self.blackKingLocation = (move.endRow,move.endCol)
             
-        
+    def changeturn(self):
+        self.whiteToMove = not self.whiteToMove
     
     def undoMove(self):
         if len(self.moveLog) != 0 :
@@ -280,7 +280,7 @@ class GameState():
             if r-1 >= 0 and c-1 >= 0 and self.board[r-1][c-1][0] == "s":  #soldaki taşı yemek için
                 if not piecePinned or pinDirection == (-1,-1):
                     moves.append(Adım((r,c),(r-1,c-1),self.board)) 
-            if r-1 >= 0 and c+1 <= 7 and self.board[r-1][c+1][0] == "s":  #sağdaki taşı yemek için
+            if r-1 >= 0 and c+1 <= 9 and self.board[r-1][c+1][0] == "s":  #sağdaki taşı yemek için
                 if not piecePinned or pinDirection == (-1,1):
                     moves.append(Adım((r,c),(r-1,c+1),self.board)) 
         
@@ -295,7 +295,7 @@ class GameState():
             if r+1 <= 9 and c-1 >= 0 and self.board[r+1][c-1][0] == "b":  #sağdaki taşı yemek için
                 if not piecePinned or pinDirection == (1,-1):
                     moves.append(Adım((r,c),(r+1,c-1),self.board)) 
-            if r+1 <= 9 and c+1 <= 7 and self.board[r+1][c+1][0] == "b":  #soldaki taşı yemek için
+            if r+1 <= 9 and c+1 <= 9 and self.board[r+1][c+1][0] == "b":  #soldaki taşı yemek için
                 if not piecePinned or pinDirection == (1,1):
                     moves.append(Adım((r,c),(r+1,c+1),self.board)) 
 

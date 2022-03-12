@@ -1,15 +1,14 @@
 from os import pipe
 import pygame as p
-import Tahta,bot
-
+from pygame import font
+import Tahta,bot,kaydet
+from PyQt5 import QtCore, QtGui, QtWidgets
 '''
-
 x)bot sona taş getirince bir taş yok ETMİYOR çalışmıyor
 x)son kalan taş sahsa berabere bitme eklemedim
-5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek
-6) data base eklenicek
+5,75) piyon sona gelince seçebilicegi taşları renklendirme eklenicek 
 7) bi ara bota biraz zeka ekle
-
+8) movelog kaydediliyor ama oyun başlayınca kullanılmıyor
 '''
 
 tahta_WIDTH = tahta_HEIGHT = 700 
@@ -26,13 +25,15 @@ def loadImage():
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"),(SQ_SIZE,SQ_SIZE))
 
 #programı çalıştırıcak olan bölüm
-def main(taraf,renk):
+def main(taraf,renk,kayıtlıoyun,tahta,sırasayısı):
     p.init()
     screen = p.display.set_mode((tahta_WIDTH+moveLogPanelWıdth,tahta_HEIGHT))   #p.FULLSCREEN
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     moveLogFont = p.font.SysFont("Arial",16,False,False)
     gs = Tahta.GameState()
+    if sırasayısı == 1: #eğer sayı 1 se siyah oynar
+            gs.changeturn()
     validMoves = gs.getValidMoves()
     moveMade = False #hamle sırasını belirlemek için kullanılan veriyi azaltmak için
     animate = False
@@ -51,6 +52,11 @@ def main(taraf,renk):
     else:
         playerOne = True
         playerTwo = True
+    print(kayıtlıoyun)
+    if kayıtlıoyun == 0:
+        pass
+    else:
+        gs.board = tahta
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         for e in p.event.get():
@@ -62,7 +68,24 @@ def main(taraf,renk):
                     location = p.mouse.get_pos()  # location 2 değer alır (farenin x ve y değerlerini)
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
-                    if sqSelected == (row,col) or col >=10: #oyuncunun aynı iki kareyi seçmemesi için
+                    if 620<= location[1] <=670 and 800 <= location[0] <= 950:
+                        süre = "0"
+                        if gs.whiteToMove:
+                            sıra = "sıra beyazda"
+                            sırasayı = 0
+                            mainwindow = QtWidgets.QMainWindow()
+                            ui = kaydet.kaydet()
+                            ui.setupUi(mainwindow,sıra,sırasayı,süre,gs.moveLog,gs.board,taraf,renk)
+                            mainwindow.show()
+                            
+                        else:
+                            sıra = "sıra siyahta"
+                            sırasayı = 1
+                            mainwindow = QtWidgets.QMainWindow()
+                            ui = kaydet.kaydet()
+                            ui.setupUi(mainwindow,sıra,sırasayı,süre,gs.moveLog,gs.board,taraf,renk)
+                            mainwindow.show()
+                    elif sqSelected == (row,col) or col >=10: #oyuncunun aynı iki kareyi seçmemesi için
                         sqSelected = () # seçilen kareyi temizler
                         playerClicks = [] # oyuncunun seçtigi iki kareyi temizler
                     else:
@@ -142,15 +165,21 @@ def main(taraf,renk):
         p.display.flip()
 
 
-
-
+def drawPiyonSon(gs,screen):
+    for r in range(0,10):
+        for c in range(0,10):
+            if gs.board[r][c][0] == ("b" if gs.whiteToMove else "s"):
+                s = p.Surface((SQ_SIZE,SQ_SIZE))
+                s.set_alpha(100)
+                s.fill(p.Color("black"))
+                screen.blit(s,(c*SQ_SIZE,r*SQ_SIZE))
 
 def drawGameState(screen,gs,validMoves,sqSelected,moveLogFont):
     drawBoard(screen)  # oyunun karelerini çizmek için
     hinglightSquares(screen,gs,validMoves,sqSelected)
     drawPieces(screen, gs.board) #oyunun taşlarını çizmek için
     drawMoveLog(screen,gs,moveLogFont)
-
+    kaydetbuton(screen)
 
 def drawBoard(screen):
     global colors
@@ -190,7 +219,7 @@ def drawMoveLog(screen,gs,font):
         if i+1 <len(moveLog):
             movestring += moveLog[i+1].getChessNotation()
         moveTexts.append(movestring)
-    
+
     movesPerRow = 3
     padding = 5
     lanespacing = 3
@@ -204,6 +233,13 @@ def drawMoveLog(screen,gs,font):
         textLocation = moveLogRect.move(padding,textY)
         screen.blit(textObject,textLocation)
         textY += textObject.get_height() + lanespacing
+
+def kaydetbuton(screen):
+    p.draw.rect(screen, (255,255,255), p.Rect(800, 620, 150, 50),0)
+    font=p.font.SysFont("Arial",16,True,False)
+    Yazı = font.render("Oyunu Kaydet",0,(255,0,0))
+    screen.blit(Yazı,(814,633))
+
 
 def animateMove(move,screen,board,clock):
     global colors
@@ -233,4 +269,4 @@ def drawEndGameText(screen, text):
     screen.blit(textObject,textLocation.move(2,2))
 
 if __name__ == "__main__":
-    main(2,0)
+    main(2,0,0,0,0)
